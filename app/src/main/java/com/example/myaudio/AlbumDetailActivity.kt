@@ -46,7 +46,7 @@ class AlbumDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(albumSongs!!.size < 1){
+        if(!(albumSongs!!.size < 1)){
             albumDetailsAdapter = AlbumDetailsAdapter(this,albumSongs)
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = albumDetailsAdapter
