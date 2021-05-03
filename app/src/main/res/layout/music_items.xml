@@ -16,14 +16,20 @@
 
     <TextView
         android:id="@+id/music_file_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="File Name"
+        android:layout_weight="1"
         android:layout_marginStart="16dp"
         android:textColor="@color/white"
         android:textSize="18sp"
         android:layout_marginLeft="16dp" />
 
-
+    <ImageView
+        android:id="@+id/menuMore"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_baseline_more"
+        android:padding="10dp" />
 </LinearLayout>

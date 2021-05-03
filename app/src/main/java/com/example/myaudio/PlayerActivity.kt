@@ -1,6 +1,5 @@
 package com.example.myaudio
 
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -20,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_player.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
@@ -37,6 +38,10 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try {
+            this.supportActionBar!!.hide()
+        } catch (e: NullPointerException) {
+        }
         setContentView(R.layout.activity_player)
         getIntentMethod()
         song_name.text = listSongs?.get(position)!!.title
@@ -69,7 +74,25 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
                 handler.postDelayed(this, 1000)
             }
         })
+        id_shuffle.setOnClickListener {
+            if (MainActivity.shuffleBoolean) {
+                MainActivity.shuffleBoolean = false
+                id_shuffle.setImageResource(R.drawable.ic_shuffle_off)
+            } else {
+                MainActivity.shuffleBoolean = true
+                id_shuffle.setImageResource(R.drawable.ic_baseline_shuffle_on)
+            }
+        }
 
+        id_repeat.setOnClickListener {
+            if (MainActivity.repeatBoolean) {
+                MainActivity.repeatBoolean = false
+                id_repeat.setImageResource(R.drawable.ic_repeat_off)
+            } else {
+                MainActivity.repeatBoolean = true
+                id_repeat.setImageResource(R.drawable.ic_baseline_repeat__on)
+            }
+        }
     }
 
     override fun onResume() {
@@ -95,7 +118,11 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             if (mediaPlayer!!.isPlaying) {
                 mediaPlayer!!.stop()
                 mediaPlayer!!.release()
-                position = ((position + 1) % listSongs!!.size)
+                if (MainActivity.shuffleBoolean && !MainActivity.repeatBoolean) {
+                    position = getRandom(listSongs!!.size - 1)
+                } else if(!MainActivity.shuffleBoolean && !MainActivity.repeatBoolean){
+                    position = ((position + 1) % listSongs!!.size)
+                }
                 uri = Uri.parse(listSongs!!.get(position).path)
                 mediaPlayer = MediaPlayer.create(applicationContext, uri)
                 metaData(uri!!)
@@ -110,7 +137,11 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             } else {
                 mediaPlayer!!.stop()
                 mediaPlayer!!.release()
-                position = ((position + 1) % listSongs!!.size)
+                if (MainActivity.shuffleBoolean && !MainActivity.repeatBoolean) {
+                    position = getRandom(listSongs!!.size - 1)
+                } else if(!MainActivity.shuffleBoolean && !MainActivity.repeatBoolean){
+                    position = ((position + 1) % listSongs!!.size)
+                }
                 uri = Uri.parse(listSongs!!.get(position).path)
                 mediaPlayer = MediaPlayer.create(applicationContext, uri)
                 metaData(uri!!)
@@ -122,6 +153,11 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
                 play_pause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
             }
         }
+    }
+
+    fun getRandom(i: Int): Int {
+        var random: Random = Random()
+        return random.nextInt(i + 1)
     }
 
     private fun prevThreadBtn() {
@@ -140,7 +176,11 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             if (mediaPlayer!!.isPlaying) {
                 mediaPlayer!!.stop()
                 mediaPlayer!!.release()
-                position = if ((position - 1) < 0) (listSongs!!.size - 1) else (position - 1)
+                if (MainActivity.shuffleBoolean && !MainActivity.repeatBoolean) {
+                    position = getRandom(listSongs!!.size - 1)
+                } else if(!MainActivity.shuffleBoolean && !MainActivity.repeatBoolean){
+                    position = if ((position - 1) < 0) (listSongs!!.size - 1) else (position - 1)
+                }
                 uri = Uri.parse(listSongs!!.get(position).path)
                 mediaPlayer = MediaPlayer.create(applicationContext, uri)
                 metaData(uri!!)
@@ -155,7 +195,11 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
             } else {
                 mediaPlayer!!.stop()
                 mediaPlayer!!.release()
-                position = if ((position - 1) < 0) (listSongs!!.size - 1) else (position - 1)
+                if (MainActivity.shuffleBoolean && !MainActivity.repeatBoolean) {
+                    position = getRandom(listSongs!!.size - 1)
+                } else if(!MainActivity.shuffleBoolean && !MainActivity.repeatBoolean){
+                    position = if ((position - 1) < 0) (listSongs!!.size - 1) else (position - 1)
+                }
                 uri = Uri.parse(listSongs!!.get(position).path)
                 mediaPlayer = MediaPlayer.create(applicationContext, uri)
                 metaData(uri!!)
@@ -350,8 +394,8 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
     override fun onCompletion(mp: MediaPlayer?) {
         nextBtnClick()
-        if(mediaPlayer != null){
-            mediaPlayer = MediaPlayer.create(applicationContext,uri)
+        if (mediaPlayer != null) {
+            mediaPlayer = MediaPlayer.create(applicationContext, uri)
             mediaPlayer!!.start()
             mediaPlayer!!.setOnCompletionListener(this)
         }

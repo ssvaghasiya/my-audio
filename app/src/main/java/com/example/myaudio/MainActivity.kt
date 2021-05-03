@@ -23,9 +23,14 @@ import kotlin.collections.ArrayList
 class MainActivity : AppCompatActivity() {
 
     private val STORAGE_PERMISSION_CODE = 101
+
     companion object {
         var musicFiles: ArrayList<MusicFiles>? = null
+        var shuffleBoolean: Boolean = false
+        var repeatBoolean: Boolean = false
+
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,7 +68,8 @@ class MainActivity : AppCompatActivity() {
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.ARTIST
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media._ID
         )
 
         var cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
@@ -74,10 +80,11 @@ class MainActivity : AppCompatActivity() {
                 var duration = cursor.getString(2)
                 var path = cursor.getString(3)
                 var artist = cursor.getString(4)
+                var id = cursor.getString(5)
 
-                var musicFiles: MusicFiles = MusicFiles(path, title, artist, album, duration)
+                var musicFiles: MusicFiles = MusicFiles(path, title, artist, album, duration, id)
                 tempAudioList.add(musicFiles)
-                Log.e("Songs",title+"  "+path)
+                Log.e("Songs", title + "  " + path)
             }
 
             cursor.close()
