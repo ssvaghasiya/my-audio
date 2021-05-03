@@ -60,7 +60,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:background="@drawable/gradient_bg"
             android:src="@drawable/ic_launcher_foreground" />
 
         <ImageView
@@ -70,8 +69,8 @@
             android:layout_alignParentBottom="true"
             android:scaleType="fitXY"
             android:background="@drawable/gradient_bg"
-            android:visibility="gone"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:visibility="visible"
+            />
 
 
     </RelativeLayout>
