@@ -55,12 +55,9 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            this.supportActionBar!!.hide()
-        } catch (e: NullPointerException) {
-        }
         setFullScreen()
         setContentView(R.layout.activity_player)
+        this.supportActionBar!!.hide()
         getIntentMethod()
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

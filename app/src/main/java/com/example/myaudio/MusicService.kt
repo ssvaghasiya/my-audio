@@ -177,27 +177,28 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
             thumb = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_foreground)
         }
 
-        var notification = NotificationCompat.Builder(this, ApplicationClass.CHANNEL_ID_2!!)
-            .setSmallIcon(playPauseBtn)
-            .setLargeIcon(thumb)
-            .setContentTitle(musicFiles?.get(position)?.title)
-            .setContentText(musicFiles?.get(position)?.artist)
-            .addAction(R.drawable.ic_baseline_skip_previous_24, "Previous", prevPending)
-            .addAction(playPauseBtn, "Pause", pausePending)
-            .addAction(R.drawable.ic_baseline_skip_next_24, "Next", nextPending)
-            .setStyle(
-                androidx.media.app.NotificationCompat.MediaStyle()
-                    .setMediaSession(mediaSessionCompat?.sessionToken)
-            )
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setOnlyAlertOnce(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .build()
+        try {
+            var notification = NotificationCompat.Builder(this, ApplicationClass.CHANNEL_ID_2!!)
+                .setSmallIcon(playPauseBtn)
+                .setLargeIcon(thumb)
+                .setContentTitle(musicFiles?.get(position)?.title)
+                .setContentText(musicFiles?.get(position)?.artist)
+                .addAction(R.drawable.ic_baseline_skip_previous_24, "Previous", prevPending)
+                .addAction(playPauseBtn, "Pause", pausePending)
+                .addAction(R.drawable.ic_baseline_skip_next_24, "Next", nextPending)
+                .setStyle(
+                    androidx.media.app.NotificationCompat.MediaStyle()
+                        .setMediaSession(mediaSessionCompat?.sessionToken)
+                )
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setOnlyAlertOnce(true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .build()
 
-//        var notificationManager: NotificationManager =
-//            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.notify(0, notification)
-        startForeground(0, notification)
+            startForeground(2, notification)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun getAlbumArt(uri: String): ByteArray? {
