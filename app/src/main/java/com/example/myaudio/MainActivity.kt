@@ -123,23 +123,10 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     fun checkPermission(permission: String, requestCode: Int): Boolean {
 
         // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(
-                this@MainActivity,
-                permission
-            )
-            == PackageManager.PERMISSION_DENIED
-        ) {
-            return false
-        } else {
-            Toast
-                .makeText(
-                    this@MainActivity,
-                    "Permission already granted",
-                    Toast.LENGTH_SHORT
-                )
-                .show()
-            return true
-        }
+        return ContextCompat.checkSelfPermission(
+            this@MainActivity,
+            permission
+        ) != PackageManager.PERMISSION_DENIED
     }
 
     override fun onRequestPermissionsResult(
