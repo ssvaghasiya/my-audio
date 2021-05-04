@@ -338,7 +338,12 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener {
 
     private fun getIntentMethod() {
         position = intent.getIntExtra("position", -1)
-        listSongs = MainActivity.musicFiles
+        var sender: String? = intent.getStringExtra("sender")
+        if(sender != null && sender.equals("albumDetails")){
+            listSongs = AlbumDetailsAdapter.albumFiles
+        } else{
+            listSongs = MusicAdapter.mFiles
+        }
         if (listSongs != null) {
             play_pause.setImageResource(R.drawable.ic_baseline_pause_24)
             uri = Uri.parse(listSongs!!.get(position).path)

@@ -14,11 +14,13 @@ import com.bumptech.glide.Glide
 class AlbumDetailsAdapter : RecyclerView.Adapter<AlbumDetailsAdapter.MyViewHolder> {
 
     var context: Context? = null
-    var albumFiles: ArrayList<MusicFiles>? = ArrayList()
+    companion object {
+        var albumFiles: ArrayList<MusicFiles>? = ArrayList()
+    }
 
     constructor(context: Context, mFiles: ArrayList<MusicFiles>?) {
         this.context = context
-        this.albumFiles = mFiles
+        albumFiles = mFiles
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -42,11 +44,12 @@ class AlbumDetailsAdapter : RecyclerView.Adapter<AlbumDetailsAdapter.MyViewHolde
                 .load(R.drawable.ic_launcher_foreground)
                 .into(holder.album_image!!)
         }
-//        holder.itemView.setOnClickListener {
-//            val i = Intent(context, AlbumDetailActivity::class.java)
-//            i.putExtra("albumName", albumFiles!!.get(position).album)
-//            context!!.startActivity(i)
-//        }
+        holder.itemView.setOnClickListener {
+            val i = Intent(context, PlayerActivity::class.java)
+            i.putExtra("sender", "albumDetails")
+            i.putExtra("position", position)
+            context!!.startActivity(i)
+        }
 
     }
 

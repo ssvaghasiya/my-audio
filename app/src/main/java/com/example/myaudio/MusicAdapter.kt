@@ -22,11 +22,15 @@ import java.io.File
 class MusicAdapter : RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
 
     var context: Context? = null
-    var mFiles: ArrayList<MusicFiles>? = ArrayList()
+
+    companion object {
+        var mFiles: ArrayList<MusicFiles>? = ArrayList()
+    }
+
 
     constructor(context: Context, mFiles: ArrayList<MusicFiles>?) {
         this.context = context
-        this.mFiles = mFiles
+        MusicAdapter.mFiles = mFiles
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -110,6 +114,12 @@ class MusicAdapter : RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
         var art = retriever.embeddedPicture
         retriever.release()
         return art
+    }
+
+    fun updateList(musicFilesArrayList: ArrayList<MusicFiles>){
+        mFiles = ArrayList()
+        mFiles!!.addAll(musicFilesArrayList)
+        notifyDataSetChanged()
     }
 
 }

@@ -41,8 +41,8 @@ class AlbumFragment : Fragment() {
         var view = inflater.inflate(R.layout.fragment_album, container, false)
         recyclerView = view.findViewById<View>(R.id.recycleViewAlbum) as RecyclerView
         recyclerView?.setHasFixedSize(true)
-        if (!(MainActivity.musicFiles!!.size < 1)) {
-            albumAdapter = AlbumAdapter(context!!, MainActivity.musicFiles)
+        if (!(MainActivity.albums!!.size < 1)) {
+            albumAdapter = AlbumAdapter(context!!, MainActivity.albums)
             recyclerView?.adapter = albumAdapter
             recyclerView?.layoutManager = GridLayoutManager(context,2)
         }
