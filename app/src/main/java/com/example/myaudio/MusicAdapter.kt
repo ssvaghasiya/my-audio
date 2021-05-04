@@ -109,10 +109,15 @@ class MusicAdapter : RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
     }
 
     fun getAlbumArt(uri: String): ByteArray? {
-        var retriever: MediaMetadataRetriever = MediaMetadataRetriever()
-        retriever.setDataSource(uri.toString())
-        var art = retriever.embeddedPicture
-        retriever.release()
+        var art: ByteArray? = null
+        try {
+            var retriever: MediaMetadataRetriever = MediaMetadataRetriever()
+            retriever.setDataSource(uri.toString())
+            art = retriever.embeddedPicture
+            retriever.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return art
     }
 

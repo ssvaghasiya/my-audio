@@ -44,34 +44,38 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        var myPosition: Int? = intent!!.getIntExtra("servicePosition", -1)
-        var actionName: String? = intent!!.getStringExtra("ActionName")
+        try {
+            var myPosition: Int? = intent!!.getIntExtra("servicePosition", -1)
+            var actionName: String? = intent!!.getStringExtra("ActionName")
 
-        if (myPosition != -1) {
-            playMedia(myPosition!!)
-        }
+            if (myPosition != -1) {
+                playMedia(myPosition!!)
+            }
 
-        if (actionName != null) {
-            when (actionName) {
-                "playPause" -> {
-//                    Toast.makeText(this, "PlayPause",Toast.LENGTH_LONG).show()
-                    if (actionPlaying != null) {
-                        actionPlaying!!.playPauseBtnClick()
+            if (actionName != null) {
+                when (actionName) {
+                    "playPause" -> {
+                        //                    Toast.makeText(this, "PlayPause",Toast.LENGTH_LONG).show()
+                        if (actionPlaying != null) {
+                            actionPlaying!!.playPauseBtnClick()
+                        }
                     }
-                }
-                "previous" -> {
-//                    Toast.makeText(this, "previous",Toast.LENGTH_LONG).show()
-                    if (actionPlaying != null) {
-                        actionPlaying!!.prevBtnClick()
+                    "previous" -> {
+                        //                    Toast.makeText(this, "previous",Toast.LENGTH_LONG).show()
+                        if (actionPlaying != null) {
+                            actionPlaying!!.prevBtnClick()
+                        }
                     }
-                }
-                "next" -> {
-//                    Toast.makeText(this, "next",Toast.LENGTH_LONG).show()
-                    if (actionPlaying != null) {
-                        actionPlaying!!.nextBtnClick()
+                    "next" -> {
+                        //                    Toast.makeText(this, "next",Toast.LENGTH_LONG).show()
+                        if (actionPlaying != null) {
+                            actionPlaying!!.nextBtnClick()
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return START_STICKY
     }
@@ -202,10 +206,15 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     }
 
     fun getAlbumArt(uri: String): ByteArray? {
-        var retriever: MediaMetadataRetriever = MediaMetadataRetriever()
-        retriever.setDataSource(uri.toString())
-        var art = retriever.embeddedPicture
-        retriever.release()
+        var art: ByteArray? = null
+        try {
+            var retriever: MediaMetadataRetriever = MediaMetadataRetriever()
+            retriever.setDataSource(uri.toString())
+            art = retriever.embeddedPicture
+            retriever.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return art
     }
 
