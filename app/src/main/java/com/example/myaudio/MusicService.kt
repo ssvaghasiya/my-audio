@@ -15,6 +15,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     var musicFiles: ArrayList<MusicFiles> = ArrayList()
     var uri: Uri? = null
     var position: Int = -1
+    var actionPlaying: ActionPlaying? = null
+
     override fun onCreate() {
         super.onCreate()
     }
@@ -31,8 +33,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        var myPosition: Int = intent!!.getIntExtra("servicePosition",-1)
-        if(myPosition != -1){
+        var myPosition: Int = intent!!.getIntExtra("servicePosition", -1)
+        if (myPosition != -1) {
             playMedia(myPosition)
         }
         return START_STICKY
@@ -48,7 +50,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 createMediaPlayer(position)
                 mediaPlayer?.start()
             }
-        } else{
+        } else {
             createMediaPlayer(position)
             mediaPlayer?.start()
         }
@@ -91,12 +93,17 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
         mediaPlayer = MediaPlayer.create(baseContext, uri)
     }
 
-    fun OnCompleted(){
+    fun OnCompleted() {
         mediaPlayer?.setOnCompletionListener(this)
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
-
+        if (actionPlaying != null) {
+            actionPlaying?.nextBtnClick()
+        }
+        createMediaPlayer(position)
+        mediaPlayer?.start()
+        OnCompleted()
     }
 
 }

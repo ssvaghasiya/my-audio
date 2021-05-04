@@ -1,5 +1,7 @@
 package com.example.myaudio
 
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,6 +16,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.support.v4.media.session.MediaSessionCompat
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
@@ -21,8 +24,13 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
+import com.example.myaudio.ApplicationClass.Companion.ACTION_NEXT
+import com.example.myaudio.ApplicationClass.Companion.ACTION_PLAY
+import com.example.myaudio.ApplicationClass.Companion.ACTION_PREVIOUS
+import com.example.myaudio.ApplicationClass.Companion.CHANNEL_ID_2
 import kotlinx.android.synthetic.main.activity_player.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -36,6 +44,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
     var prevThread: Thread? = null
     var nextThread: Thread? = null
     var musicService: MusicService? = null
+    var mediaSessionCompat: MediaSessionCompat? = null
 
     companion object {
         var listSongs: ArrayList<MusicFiles>? = ArrayList()
@@ -50,8 +59,8 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
         } catch (e: NullPointerException) {
         }
         setContentView(R.layout.activity_player)
+        mediaSessionCompat = MediaSessionCompat(baseContext, "My Audio")
         getIntentMethod()
-
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (musicService != null && fromUser) {
@@ -145,6 +154,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
                 musicService!!.OnCompleted()
+                showNotification(R.drawable.ic_baseline_pause_24)
                 play_pause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
                 musicService!!.start()
 
@@ -165,6 +175,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
                 musicService!!.OnCompleted()
+                showNotification(R.drawable.ic_baseline_play_arrow_24)
                 play_pause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
             }
         }
@@ -205,6 +216,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
                 musicService!!.OnCompleted()
+                showNotification(R.drawable.ic_baseline_pause_24)
                 play_pause.setBackgroundResource(R.drawable.ic_baseline_pause_24)
                 musicService!!.start()
 
@@ -225,6 +237,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
                 musicService!!.OnCompleted()
+                showNotification(R.drawable.ic_baseline_play_arrow_24)
                 play_pause.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24)
             }
         }
@@ -245,12 +258,14 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
         if (musicService != null) {
             if (musicService!!.isPlaying()!!) {
                 play_pause.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                showNotification(R.drawable.ic_baseline_play_arrow_24)
                 musicService!!.pause()
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
 
             } else {
                 play_pause.setImageResource(R.drawable.ic_baseline_pause_24)
+                showNotification(R.drawable.ic_baseline_pause_24)
                 musicService!!.start()
                 seekBar.max = musicService!!.getDuration() / 1000
                 setProgressBar()
@@ -365,7 +380,7 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
             play_pause.setImageResource(R.drawable.ic_baseline_pause_24)
             uri = Uri.parse(listSongs!!.get(position).path)
         }
-
+        showNotification(R.drawable.ic_baseline_pause_24)
         var intent = Intent(this, MusicService::class.java)
         intent.putExtra("servicePosition", position)
         startService(intent)
@@ -430,5 +445,61 @@ class PlayerActivity : AppCompatActivity(), MediaPlayer.OnCompletionListener, Ac
         song_name.text = listSongs?.get(position)!!.title
         song_artist.text = listSongs?.get(position)!!.artist
         musicService!!.OnCompleted()
+    }
+
+    fun showNotification(playPauseBtn: Int) {
+        var intent: Intent = Intent(this, PlayerActivity::class.java)
+        var contentIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
+        var prevIntent: Intent = Intent(this, NotificationReceiver::class.java)
+            .setAction(ACTION_PREVIOUS)
+        var prevPending =
+            PendingIntent.getBroadcast(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        var pauseIntent: Intent = Intent(this, NotificationReceiver::class.java)
+            .setAction(ACTION_PLAY)
+        var pausePending =
+            PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        var nextIntent: Intent = Intent(this, NotificationReceiver::class.java)
+            .setAction(ACTION_NEXT)
+        var nextPending =
+            PendingIntent.getBroadcast(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        var picture = getAlbumArt(listSongs?.get(position)?.path!!)
+        var thumb: Bitmap? = null
+        if (picture != null) {
+            thumb = BitmapFactory.decodeByteArray(picture, 0, picture.size)
+        } else {
+            thumb = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher_foreground)
+        }
+
+        var notification = NotificationCompat.Builder(this, CHANNEL_ID_2!!)
+            .setSmallIcon(playPauseBtn)
+            .setLargeIcon(thumb)
+            .setContentTitle(listSongs?.get(position)?.title)
+            .setContentText(listSongs?.get(position)?.artist)
+            .addAction(R.drawable.ic_baseline_skip_previous_24, "Previous", prevPending)
+            .addAction(playPauseBtn, "Pause", pausePending)
+            .addAction(R.drawable.ic_baseline_skip_next_24, "Next", nextPending)
+            .setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(mediaSessionCompat?.sessionToken)
+            )
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setOnlyAlertOnce(true)
+            .build()
+
+        var notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, notification)
+    }
+
+    fun getAlbumArt(uri: String): ByteArray? {
+        var retriever: MediaMetadataRetriever = MediaMetadataRetriever()
+        retriever.setDataSource(uri.toString())
+        var art = retriever.embeddedPicture
+        retriever.release()
+        return art
     }
 }
